@@ -8,12 +8,11 @@ terraform {
     }
   }
 
-# backend "s3" {
-#   bucket = "healthcare-terraform-state"
-#   key    = "healthcare_project/terraform.tfstate"
-#   region = "us-east-1"
-# }
-
+  backend "s3" {
+    bucket = "healthcare-terraform-state"
+    key    = "healthcare_project/terraform.tfstate"
+    region = "us-east-1"
+  }
 }
 
 provider "aws" {
