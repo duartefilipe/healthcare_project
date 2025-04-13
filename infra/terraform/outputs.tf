@@ -1,6 +1,6 @@
 output "ec2_public_ip" {
   description = "Public IP of the EC2 instance"
-  value       = module.ecs.public_ip
+  value       = module.ecs.ec2_public_ip
 }
 
 output "remote_user" {
@@ -9,7 +9,7 @@ output "remote_user" {
 }
 
 output "ssh_private_key" {
-  description = "Private key to access EC2"
-  value       = module.ecs.private_key_pem
+  value       = tls_private_key.ec2_key.private_key_pem
   sensitive   = true
+  description = "Chave privada para acesso SSH na instância EC2"
 }
