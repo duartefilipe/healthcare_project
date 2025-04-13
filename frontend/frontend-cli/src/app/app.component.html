@@ -1,0 +1,9 @@
+<nav *ngIf="isLoggedIn">
+  <a routerLink="/home">Home</a> |
+  <a routerLink="/patients/form">Cadastrar Paciente</a> |
+  <a routerLink="/patients">Lista de Pacientes</a>
+  <span *ngIf="isAdmin"> | <a routerLink="/users">Usuários</a></span> |
+  <a href="#" (click)="logout()">Logout</a>
+</nav>
+
+<router-outlet></router-outlet>

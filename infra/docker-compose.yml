@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: healthcare
+    ports:
+      - "5432:5432"
+
+  patient-service:
+    build: ../patient-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ../frontend/frontend-cli
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    depends_on:
+      - patient-service
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - patient-service
+  
+  auth-service:
+    build: ../auth-service
+    ports:
+      - "8081:8081"
+
+volumes:
+  grafana-storage:
