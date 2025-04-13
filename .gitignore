@@ -1,0 +1,27 @@
+# Java
+target/
+*.class
+
+# Angular/Node
+node_modules/
+.angular/
+dist/
+*.log
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+
+# IDEs
+.vscode/
+.idea/
+
+# MacOS/Linux
+.DS_Store
+
+# Executáveis
+*.jar
+*.war
