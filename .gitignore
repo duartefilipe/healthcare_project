@@ -1,19 +1,8 @@
-# Java
-target/
-*.class
-
 # Angular/Node
 node_modules/
 .angular/
 dist/
 *.log
-
-# Terraform
-.terraform/
-terraform.tfstate
-terraform.tfstate.backup
-*.tfstate
-*.tfstate.*
 
 # IDEs
 .vscode/
@@ -25,3 +14,11 @@ terraform.tfstate.backup
 # Executáveis
 *.jar
 *.war
+
+# Java
+target/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
