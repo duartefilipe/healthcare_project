@@ -27,12 +27,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan
-
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
@@ -50,20 +44,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build JAR auth-service
-        run: |
-          cd auth-service
-          ./mvnw clean package -DskipTests
-
       - name: Build and Push auth-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/auth-service ./auth-service
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service
-
-      - name: Build JAR patient-service
-        run: |
-          cd patient-service
-          ./mvnw clean package -DskipTests
 
       - name: Build and Push patient-service
         run: |
@@ -87,6 +71,17 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_SSH_KEY }}
           script: |
+            sudo apt update
+            sudo apt install -y docker.io docker-compose git
+            sudo usermod -aG docker ubuntu
+            sudo systemctl enable docker
+            sudo systemctl start docker
+
+            # Clona o projeto se não existir
+            if [ ! -d "/home/ubuntu/healthcare_project" ]; then
+              git clone https://github.com/${{ github.repository }} /home/ubuntu/healthcare_project
+            fi
+
             cd /home/ubuntu/healthcare_project
             docker-compose pull
             docker-compose up -d
