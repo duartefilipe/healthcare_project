@@ -1,4 +1,4 @@
-name: Deploy Infra & Aplicações
+name: Deploy Infra & Aplicacoes
 
 on:
   push:
@@ -40,7 +40,6 @@ jobs:
     name: Build & Push Docker Images
     needs: terraform
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -97,12 +96,14 @@ jobs:
             REPO_URL="https://github.com/duartefilipe/healthcare_project.git"
             DEST_DIR="/home/ubuntu/healthcare_project"
 
+            # Instala docker-compose se não estiver disponível
             if ! command -v docker-compose &> /dev/null; then
               echo "Instalando docker-compose..."
               sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
+            # Clona ou atualiza o repositório
             if [ ! -d "$DEST_DIR/.git" ]; then
               echo "Clonando o repositório..."
               git clone "$REPO_URL" "$DEST_DIR"
@@ -112,6 +113,13 @@ jobs:
               git pull origin main
             fi
 
+            # Entra no diretório e sobe os containers
             cd "$DEST_DIR"
+
+            if [ ! -f "docker-compose.yml" ]; then
+              echo "Arquivo docker-compose.yml não encontrado no repositório clonado."
+              exit 1
+            fi
+
             docker-compose pull
             docker-compose up -d
