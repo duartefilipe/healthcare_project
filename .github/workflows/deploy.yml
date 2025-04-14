@@ -99,9 +99,18 @@ jobs:
             DEST_DIR="/home/ubuntu/healthcare_project"
             COMPOSE_FILE_PATH="infra/docker-compose.yml"
 
+            echo "Verificando se Docker está instalado..."
+            if ! command -v docker &> /dev/null; then
+              echo "Docker não está instalado. Instalando Docker..."
+              sudo apt-get update
+              sudo apt-get install -y docker.io
+              sudo systemctl enable docker
+              sudo usermod -aG docker $USER
+            fi
+
             echo "Verificando se o Docker está rodando..."
             if ! sudo systemctl is-active --quiet docker; then
-              echo "Docker não está rodando. Iniciando..."
+              echo "Iniciando Docker..."
               sudo systemctl start docker
             fi
 
@@ -127,10 +136,10 @@ jobs:
             ls -la
 
             if [ ! -f "$COMPOSE_FILE_PATH" ]; then
-              echo "Arquivo docker-compose.yml não encontrado no caminho $COMPOSE_FILE_PATH"
+              echo "Arquivo docker-compose.yml não encontrado em: $COMPOSE_FILE_PATH"
               exit 1
             fi
 
-            echo "Executando docker-compose up com o arquivo $COMPOSE_FILE_PATH..."
+            echo "Executando docker-compose up..."
             docker-compose -f "$COMPOSE_FILE_PATH" pull
             docker-compose -f "$COMPOSE_FILE_PATH" up -d
