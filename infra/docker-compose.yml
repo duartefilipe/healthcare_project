@@ -11,16 +11,14 @@ services:
       - "5432:5432"
 
   patient-service:
-    build: ../patient-service
+    image: duartefilipe/patient-service
     ports:
       - "8080:8080"
     depends_on:
       - db
 
   frontend:
-    build:
-      context: ../frontend/frontend-cli
-      dockerfile: Dockerfile
+    image: duartefilipe/frontend
     ports:
       - "4200:4200"
     depends_on:
@@ -41,9 +39,9 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
       - patient-service
-  
+
   auth-service:
-    build: ../auth-service
+    image: duartefilipe/auth-service
     ports:
       - "8081:8081"
 
