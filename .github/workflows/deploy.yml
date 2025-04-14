@@ -99,6 +99,12 @@ jobs:
             DEST_DIR="/home/ubuntu/healthcare_project"
             COMPOSE_FILE_PATH="infra/docker-compose.yml"
 
+            echo "Verificando se o Docker está rodando..."
+            if ! sudo systemctl is-active --quiet docker; then
+              echo "Docker não está rodando. Iniciando..."
+              sudo systemctl start docker
+            fi
+
             echo "Instalando docker-compose (se necessário)..."
             if ! command -v docker-compose &> /dev/null; then
               sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -125,6 +131,6 @@ jobs:
               exit 1
             fi
 
-            echo "Executando docker-compose up com arquivo $COMPOSE_FILE_PATH..."
+            echo "Executando docker-compose up com o arquivo $COMPOSE_FILE_PATH..."
             docker-compose -f "$COMPOSE_FILE_PATH" pull
             docker-compose -f "$COMPOSE_FILE_PATH" up -d
