@@ -97,6 +97,7 @@ jobs:
 
             REPO_URL="git@github.com:duartefilipe/healthcare_project.git"
             DEST_DIR="/home/ubuntu/healthcare_project"
+            COMPOSE_FILE_PATH="infra/docker-compose.yml"
 
             echo "Instalando docker-compose (se necessário)..."
             if ! command -v docker-compose &> /dev/null; then
@@ -116,14 +117,14 @@ jobs:
             fi
 
             cd "$DEST_DIR"
-            echo "Conteúdo do repositório:"
+            echo "Conteúdo do repositório clonado:"
             ls -la
 
-            if [ ! -f "docker-compose.yml" ]; then
-              echo "Arquivo docker-compose.yml não encontrado!"
+            if [ ! -f "$COMPOSE_FILE_PATH" ]; then
+              echo "Arquivo docker-compose.yml não encontrado no caminho $COMPOSE_FILE_PATH"
               exit 1
             fi
 
-            echo "Executando docker-compose up..."
-            docker-compose pull
-            docker-compose up -d
+            echo "Executando docker-compose up com arquivo $COMPOSE_FILE_PATH..."
+            docker-compose -f "$COMPOSE_FILE_PATH" pull
+            docker-compose -f "$COMPOSE_FILE_PATH" up -d
