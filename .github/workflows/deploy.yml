@@ -105,7 +105,6 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y docker.io
               sudo systemctl enable docker
-              sudo usermod -aG docker $USER
             fi
 
             echo "Verificando se o Docker está rodando..."
@@ -140,6 +139,6 @@ jobs:
               exit 1
             fi
 
-            echo "Executando docker-compose up..."
-            docker-compose -f "$COMPOSE_FILE_PATH" pull
-            docker-compose -f "$COMPOSE_FILE_PATH" up -d
+            echo "Executando docker-compose up com sudo..."
+            sudo docker-compose -f "$COMPOSE_FILE_PATH" pull
+            sudo docker-compose -f "$COMPOSE_FILE_PATH" up -d
