@@ -83,18 +83,32 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend
 
   ssh-deploy:
-    name: SSH para Servidor e Docker Compose Up
-    needs: build-push
-    runs-on: ubuntu-latest
+            name: SSH para Servidor e Docker Compose Up
+            needs: build-push
+            runs-on: ubuntu-latest
+        
+            steps:
+              - name: Deploy via SSH
+                uses: appleboy/ssh-action@v0.1.6
+                with:
+                  host: ${{ secrets.REMOTE_HOST }}
+                  username: ${{ secrets.REMOTE_USER }}
+                  key: ${{ secrets.REMOTE_SSH_KEY }}
+                  script: |
+                    # Instala docker-compose se não existir
+                    if ! command -v docker-compose &> /dev/null; then
+                      echo "Instalando docker-compose..."
+                      sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                      sudo chmod +x /usr/local/bin/docker-compose
+                    fi
+        
+                    # Caminho real do projeto
+                    cd /home/ubuntu/healthcare_project
+        
+                    # Atualiza imagens e sobe os containers
+                    docker-compose pull
+                    docker-compose up -d
+                    docker-compose up -d
+        
 
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.REMOTE_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/healthcare_project
-            docker-compose pull
-            docker-compose up -d
+
