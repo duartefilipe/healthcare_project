@@ -40,7 +40,6 @@ jobs:
     name: Build & Push Docker Images
     needs: terraform
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -94,35 +93,37 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_SSH_KEY }}
           script: |
+            set -e
+
             REPO_URL="git@github.com:duartefilipe/healthcare_project.git"
             DEST_DIR="/home/ubuntu/healthcare_project"
 
+            echo "Instalando docker-compose (se necessário)..."
             if ! command -v docker-compose &> /dev/null; then
-              echo "Instalando docker-compose..."
               sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
+            echo "Verificando repositório..."
             if [ ! -d "$DEST_DIR/.git" ]; then
-              echo "Clonando o repositório..."
+              echo "Clonando repositório..."
               git clone "$REPO_URL" "$DEST_DIR"
             else
-              echo "Repositório já clonado. Atualizando..."
+              echo "Atualizando repositório..."
               cd "$DEST_DIR"
               git reset --hard
               git pull origin main
             fi
 
             cd "$DEST_DIR"
-
-            echo "Listando conteúdo do repositório clonado..."
+            echo "Conteúdo do repositório:"
             ls -la
 
             if [ ! -f "docker-compose.yml" ]; then
-              echo "Arquivo docker-compose.yml não encontrado no repositório clonado!"
+              echo "Arquivo docker-compose.yml não encontrado!"
               exit 1
             fi
 
-            echo "Arquivo encontrado, iniciando docker-compose..."
+            echo "Executando docker-compose up..."
             docker-compose pull
             docker-compose up -d
