@@ -27,16 +27,39 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-  docker-build-push:
-    name: Build and Push Docker Images
+  build-push:
+    name: Build & Push Docker Images
     needs: terraform
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build JAR auth-service
+        run: |
+          cd auth-service
+          mvn clean package -DskipTests
+
+      - name: Build JAR patient-service
+        run: |
+          cd patient-service
+          mvn clean package -DskipTests
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -44,25 +67,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push auth-service
+      - name: Build & Push auth-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/auth-service ./auth-service
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service
 
-      - name: Build and Push patient-service
+      - name: Build & Push patient-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/patient-service ./patient-service
           docker push ${{ secrets.DOCKER_USERNAME }}/patient-service
 
-      - name: Build and Push frontend
+      - name: Build & Push frontend
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend ./frontend/frontend-cli
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend
 
   ssh-deploy:
     name: SSH para Servidor e Docker Compose Up
-    needs: docker-build-push
+    needs: build-push
     runs-on: ubuntu-latest
+
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.6
@@ -71,17 +95,6 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_SSH_KEY }}
           script: |
-            sudo apt update
-            sudo apt install -y docker.io docker-compose git
-            sudo usermod -aG docker ubuntu
-            sudo systemctl enable docker
-            sudo systemctl start docker
-
-            # Clona o projeto se não existir
-            if [ ! -d "/home/ubuntu/healthcare_project" ]; then
-              git clone https://github.com/${{ github.repository }} /home/ubuntu/healthcare_project
-            fi
-
             cd /home/ubuntu/healthcare_project
             docker-compose pull
             docker-compose up -d
