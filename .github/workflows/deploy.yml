@@ -40,6 +40,7 @@ jobs:
     name: Build & Push Docker Images
     needs: terraform
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -93,7 +94,7 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_SSH_KEY }}
           script: |
-            REPO_URL="git@github.com:duartefilipe/healthcare_project.git"
+            REPO_URL="https://github.com/duartefilipe/healthcare_project.git"
             DEST_DIR="/home/ubuntu/healthcare_project"
 
             if ! command -v docker-compose &> /dev/null; then
@@ -102,7 +103,7 @@ jobs:
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
-            if [ ! -d "$DEST_DIR" ]; then
+            if [ ! -d "$DEST_DIR/.git" ]; then
               echo "Clonando o repositório..."
               git clone "$REPO_URL" "$DEST_DIR"
             else
