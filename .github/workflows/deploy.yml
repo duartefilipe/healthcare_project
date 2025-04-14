@@ -1,4 +1,4 @@
-name: Deploy Infra & Aplicacoes
+name: Deploy Infra & Aplicações
 
 on:
   push:
@@ -40,6 +40,7 @@ jobs:
     name: Build & Push Docker Images
     needs: terraform
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -93,33 +94,35 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_SSH_KEY }}
           script: |
-            REPO_URL="https://github.com/duartefilipe/healthcare_project.git"
+            REPO_URL="git@github.com:duartefilipe/healthcare_project.git"
             DEST_DIR="/home/ubuntu/healthcare_project"
 
-            # Instala docker-compose se não estiver disponível
             if ! command -v docker-compose &> /dev/null; then
               echo "Instalando docker-compose..."
               sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
 
-            # Clona ou atualiza o repositório
             if [ ! -d "$DEST_DIR/.git" ]; then
               echo "Clonando o repositório..."
               git clone "$REPO_URL" "$DEST_DIR"
             else
-              echo "Atualizando repositório..."
+              echo "Repositório já clonado. Atualizando..."
               cd "$DEST_DIR"
+              git reset --hard
               git pull origin main
             fi
 
-            # Entra no diretório e sobe os containers
             cd "$DEST_DIR"
 
+            echo "Listando conteúdo do repositório clonado..."
+            ls -la
+
             if [ ! -f "docker-compose.yml" ]; then
-              echo "Arquivo docker-compose.yml não encontrado no repositório clonado."
+              echo "Arquivo docker-compose.yml não encontrado no repositório clonado!"
               exit 1
             fi
 
+            echo "Arquivo encontrado, iniciando docker-compose..."
             docker-compose pull
             docker-compose up -d
