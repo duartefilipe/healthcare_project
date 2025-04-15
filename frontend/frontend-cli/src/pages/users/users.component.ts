@@ -10,26 +10,29 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./users.component.css'],
   imports: [CommonModule, FormsModule]
 })
+
 export class UsersComponent implements OnInit {
   users: any[] = [];
+  roles: string[] = ['ADMIN', 'MEDICO'];
+
   user = {
     id: null,
-    username: '',
+    name: '',
     password: '',
     role: ''
   };
 
   constructor(private http: HttpClient) {}
 
+
   ngOnInit() {
     this.fetchUsers();
   }
-
-  /** Monta os headers com Authorization Basic */
+  
   getAuthHeaders() {
-    const username = localStorage.getItem('username') || '';
+    const name = localStorage.getItem('name') || '';
     const password = localStorage.getItem('password') || '';
-    const basicAuth = btoa(`${username}:${password}`);
+    const basicAuth = btoa(`${name}:${password}`);
 
     return {
       headers: new HttpHeaders({
@@ -51,7 +54,7 @@ export class UsersComponent implements OnInit {
 
     const payload = method === 'post'
       ? {
-          username: this.user.username,
+        name: this.user.name,
           password: this.user.password,
           role: this.user.role
         }
@@ -74,6 +77,6 @@ export class UsersComponent implements OnInit {
   }
 
   resetForm() {
-    this.user = { id: null, username: '', password: '', role: '' };
+    this.user = { id: null, name: '', password: '', role: '' };
   }
 }

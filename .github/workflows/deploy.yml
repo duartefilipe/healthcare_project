@@ -55,9 +55,9 @@ jobs:
           cd auth-service
           mvn clean package -DskipTests
 
-      - name: Build JAR patient-service
+      - name: Build JAR medical-service
         run: |
-          cd patient-service
+          cd medical-service
           mvn clean package -DskipTests
 
       - name: Log in to Docker Hub
@@ -71,10 +71,10 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/auth-service ./auth-service
           docker push ${{ secrets.DOCKER_USERNAME }}/auth-service
 
-      - name: Build & Push patient-service
+      - name: Build & Push medical-service
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/patient-service ./patient-service
-          docker push ${{ secrets.DOCKER_USERNAME }}/patient-service
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/medical-service ./medical-service
+          docker push ${{ secrets.DOCKER_USERNAME }}/medical-service
 
       - name: Build & Push frontend
         run: |

@@ -10,8 +10,8 @@ services:
     ports:
       - "5432:5432"
 
-  patient-service:
-    image: duartefilipe/patient-service
+  medical-service:
+    image: duartefilipe/medical-service
     ports:
       - "8080:8080"
     depends_on:
@@ -22,7 +22,7 @@ services:
     ports:
       - "4200:4200"
     depends_on:
-      - patient-service
+      - medical-service
 
   grafana:
     image: grafana/grafana:latest
@@ -38,7 +38,7 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     depends_on:
-      - patient-service
+      - medical-service
 
   auth-service:
     image: duartefilipe/auth-service

@@ -1,0 +1,54 @@
+<h2>Cadastro de Paciente</h2>
+
+<form (ngSubmit)="savePatient()" style="display: flex; flex-direction: column; max-width: 400px; gap: 10px">
+  <label>Nome:
+    <input type="text" [(ngModel)]="form.name" name="name" required>
+  </label>
+
+  <label>Documento (E-mail):
+    <input type="text" [(ngModel)]="form.document" name="document" required>
+  </label>
+
+  <label>Data de Nascimento:
+    <input type="date" [(ngModel)]="form.birthDate" name="birthDate" required>
+  </label>
+
+  <label>Cartão SUS:
+    <input type="text" [(ngModel)]="form.healthCardNumber" name="healthCardNumber" required>
+  </label>
+
+  <div *ngIf="role === 'ADMIN'">
+    <label>Médico:</label>
+    <select [(ngModel)]="form.doctorId" name="doctor">
+      <option *ngFor="let d of doctors" [value]="d.id">{{ d.name }}</option>
+    </select>
+  </div>
+  
+
+  <div style="display: flex; gap: 10px">
+    <button type="submit">{{ editMode ? 'Atualizar' : 'Cadastrar' }}</button>
+    <button type="button" (click)="resetForm()">Limpar</button>
+  </div>
+</form>
+
+<h2>Lista de Pacientes</h2>
+<table border="1" cellpadding="8">
+  <thead>
+    <tr>
+      <th>ID</th><th>Nome</th><th>Documento</th><th>Nascimento</th><th>Cartão SUS</th><th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of patients">
+      <td>{{ p.id }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.document }}</td>
+      <td>{{ p.birthDate }}</td>
+      <td>{{ p.healthCardNumber }}</td>
+      <td>
+        <button (click)="edit(p)">Editar</button>
+        <button (click)="delete(p.id)">Remover</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

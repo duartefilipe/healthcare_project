@@ -1,0 +1,63 @@
+<ng-container *ngIf="role !== 'PACIENTE'">
+  <h2>Agendamento de Consulta</h2>
+
+  <form (ngSubmit)="saveAppointment()" style="display: flex; flex-direction: column; max-width: 400px; gap: 10px">
+    <label>Paciente:
+      <select [(ngModel)]="form.patientId" name="patientId" required>
+        <option *ngIf="patients.length === 0" disabled>Nenhum paciente encontrado</option>
+        <option *ngFor="let p of patients" [value]="p.id">{{ p.name }}</option>
+      </select>
+    </label>
+
+    <ng-container *ngIf="role === 'ADMIN'">
+      <label>Médico:
+        <select [(ngModel)]="form.doctorId" name="doctorId" required>
+          <option *ngIf="doctors.length === 0" disabled>Nenhum médico encontrado</option>
+          <option *ngFor="let d of doctors" [value]="d.id">{{ d.name }}</option>
+        </select>
+      </label>
+    </ng-container>
+
+    <label>Data:
+      <input type="datetime-local" [(ngModel)]="form.date" name="date" required>
+    </label>
+
+    <div style="display: flex; gap: 10px">
+      <button type="submit">{{ editMode ? 'Atualizar' : 'Agendar' }}</button>
+      <button type="button" (click)="resetForm()">Limpar</button>
+    </div>
+  </form>
+</ng-container>
+
+<h2>Consultas Agendadas</h2>
+<table border="1" cellpadding="8" style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Data</th>
+      <th>Paciente</th>
+      <th>Médico</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let a of appointments">
+      <td>{{ a.id }}</td>
+      <td>{{ a.date | date: 'short' }}</td>
+      <td>{{ a.patientName }}</td>
+      <td>{{ a.doctorName }}</td>
+      <td>
+        <ng-container *ngIf="role !== 'PACIENTE'">
+          <button (click)="edit(a)">Editar</button>
+          <button (click)="delete(a.id)">Remover</button>
+        </ng-container>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="appointments.length === 0">Nenhuma consulta encontrada.</p>
+
+<div style="margin-top: 20px">
+  <button (click)="logout()">Logout</button>
+</div>

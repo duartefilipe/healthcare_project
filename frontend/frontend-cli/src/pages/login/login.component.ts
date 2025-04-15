@@ -21,23 +21,24 @@ export class LoginComponent {
     this.http.post<any>('http://localhost:8081/auth/login', {
       username: this.username,
       password: this.password
-    }, {
-      withCredentials: true
     }).subscribe({
       next: res => {
         if (res && res.username && res.role) {
           localStorage.setItem('username', res.username);
-          localStorage.setItem('role', res.role);
           localStorage.setItem('password', this.password);
+          localStorage.setItem('role', res.role);
+          localStorage.setItem('name', res.username); 
+          localStorage.setItem('userId', res.id);
           alert(`Bem-vindo, ${res.username}!`);
           this.router.navigate(['/home']);
         } else {
-          this.error = 'Erro inesperado no login: dados incompletos';
+          this.error = 'Erro inesperado no login';
         }
       },
-      error: err => {
+      error: () => {
         this.error = 'Usuário ou senha inválidos';
       }
     });
   }
+  
 }

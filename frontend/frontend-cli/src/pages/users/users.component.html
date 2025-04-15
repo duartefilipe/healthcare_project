@@ -1,12 +1,12 @@
 <h2>Gerenciar Usuários</h2>
 
 <form (ngSubmit)="submit()" #form="ngForm">
-  <input name="username" [(ngModel)]="user.username" placeholder="Usuário" required>
+  <input name="name" [(ngModel)]="user.name" placeholder="Usuário" required>
   <input name="password" [(ngModel)]="user.password" placeholder="Senha" required>
-  <select name="role" [(ngModel)]="user.role" required>
-    <option value="ADMIN">ADMIN</option>
-    <option value="PACIENTE">PACIENTE</option>
-  </select>
+    <label>Função:</label>
+    <select name="role" [(ngModel)]="user.role" required>
+      <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+    </select>
   <button type="submit">{{ user.id ? 'Atualizar' : 'Cadastrar' }}</button>
   <button type="button" (click)="resetForm()">Limpar</button>
 </form>
@@ -25,7 +25,7 @@
   <tbody>
     <tr *ngFor="let u of users">
       <td>{{ u.id }}</td>
-      <td>{{ u.username }}</td>
+      <td>{{ u.name }}</td>
       <td>{{ u.role }}</td>
       <td>
         <button (click)="edit(u)">Editar</button>

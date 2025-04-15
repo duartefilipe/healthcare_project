@@ -1,99 +1,62 @@
-# 🏥 Healthcare Microservices Project
+# 🏥 Healthcare Project
 
-Este projeto modela um sistema de saúde baseado em arquitetura de microserviços utilizando Java com Spring Boot, Angular, AWS e observabilidade com Grafana e Prometheus.
-
----
-
-## 📦 Estrutura de Serviços
-
-- `auth-service` – Autenticação
-- `patient-service` – Cadastro de pacientes
-- `appointment-service` – Agendamento
-- `notification-service` – Notificações
-- `frontend` – Angular com consumo de APIs
+Este projeto é uma plataforma de gestão de pacientes e agendamentos médicos, construída com uma arquitetura de microserviços utilizando Spring Boot e Angular. 
+O sistema é voltado para ambientes com múltiplos perfis de usuário: **ADMIN**, **MÉDICO** e **PACIENTE**.
 
 ---
 
-## ☁️ Cloud AWS
+## Tecnologias Utilizadas
 
-### Serviços Utilizados:
-
-- EC2 – Deploy de microserviços
-- RDS – PostgreSQL
-- S3 – Armazenamento de logs por Lambda
-- EKS – Orquestração via Kubernetes
-
----
-
-## ⚙️ Como Rodar Localmente
-
-### Requisitos:
+### Backend
+- Java 17 + Spring Boot 3.4.4
+- Spring Security (com autenticação básica)
+- Spring Data JPA + PostgreSQL
+- RestTemplate para comunicação entre serviços
 - Docker e Docker Compose
+- Prometheus (monitoramento)
+- Grafana (monitoramento)
+- Actuator com endpoints customizados
 
-```bash
-docker-compose up --build
-```
+### Frontend
+- Angular Standalone
+- Login, listagem e cadastro de pacientes
+- Exibição de funcionalidades por tipo de perfil (Admin, Médico, Paciente)
 
----
-
-## ☸️ Deploy no EKS
-
-### Usando `eksctl`:
-
-```bash
-cd infra/eks
-bash eksctl-create-cluster.sh
-```
-
-### Usando `Terraform`:
-
-```bash
-cd infra/terraform
-terraform init
-terraform apply
-```
+### Infraestrutura
+- Planejado para provisionamento em AWS com Terraform (Arquivos na pasta infra onde temos os dados do monitoramento e futuro)
+  - EC2 (containers dos serviços)
+  - RDS (PostgreSQL)
+  - S3 (Seria para fazer futuramente adicionando um arquivo de historico do paciente)
+  - Lambda (eventualmente para notificações quando uma consulta é agendada para o paciente)
+- Prometheus rodando no Docker (monitoramento local em `/actuator/prometheus`)
 
 ---
 
-## 🚀 Deploy com CI/CD
+## Arquitetura de Microsserviços
 
-O pipeline GitHub Actions compila os serviços e faz o deploy via SCP para o EC2. Localizado em:
+### `auth-service`
+- Responsável pelo cadastro, autenticação e listagem de usuários
+- Endpoint de login (`/auth/login`) e verificação (`/auth/me`)
+- CRUD completo para usuários
+- Perfis suportados: `ADMIN`, `MEDICO`, `PACIENTE`
+- Password criptografado com BCrypt
 
-```bash
-.github/workflows/ci-cd.yml
-```
+### `medical-service`
+- Responsável por gerenciar pacientes
+- Cadastro de pacientes só permitido para `ADMIN` e `MÉDICO`
+- Endpoint `/patients` com autenticação
+- Consulta a usuários via `auth-service`
 
----
-
-## 📊 Monitoramento com Grafana + Prometheus
-
-- Prometheus coleta métricas expostas em `/actuator/prometheus`
-- Grafana utiliza o datasource Prometheus configurado em `infra/grafana/datasources/prometheus.yaml`
-
----
-
-## 🔧 Helm Chart
-
-```bash
-cd charts/patient-service
-helm install patient-service .
-```
+### Futuramente teria que implementar o patience-service para ficar mais organizado
 
 ---
 
-## 📁 Pastas Relevantes
+## Autenticação
 
-```
-charts/                # Helm Charts
-infra/terraform/       # Scripts Terraform para EKS, RDS, S3
-infra/eks/             # Script eksctl
-infra/grafana/         # Datasources Grafana
-infra/prometheus/      # Scrape Config Kubernetes
-.github/workflows/     # CI/CD GitHub Actions
-```
+- Implementada via **HTTP Basic Auth**
+- Angular envia as credenciais com cada requisição via Interceptor
+- `auth-service` valida as credenciais no endpoint `/auth/me`
+- Somente usuários autenticados podem acessar `/patients`
 
 ---
 
-## 📝 Autor
-
-Projeto gerado com apoio do ChatGPT para testes técnicos de arquitetura moderna em saúde.

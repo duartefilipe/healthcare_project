@@ -1,0 +1,11 @@
+<nav *ngIf="isLoggedIn">
+    <a routerLink="/home">Home</a> |
+    <ng-container *ngIf="role !== 'PACIENTE'">
+      <a routerLink="/patients" *ngIf="role === 'ADMIN' || role === 'MEDICO'">Pacientes</a>
+    </ng-container>
+    <a routerLink="/appointments">Consultas Agendadas</a>
+    <ng-container *ngIf="role === 'ADMIN'">
+      | <a routerLink="/users">Usuários</a>
+    </ng-container>
+    | <a href="#" (click)="logout()">Logout</a>
+  </nav>
